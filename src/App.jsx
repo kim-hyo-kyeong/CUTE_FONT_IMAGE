@@ -48,14 +48,49 @@ const App = () => {
   ];
 
   useEffect(() => {
+    let isMounted = true;
+    
+    const updateCanvas = () => {
+      if (!isMounted || !canvasRef.current) return;
+      renderToCanvas(canvasRef.current, { text, font, bubbleColor, borderColor, textColor, bubbleType, hasTail });
+      setImgDataUrl(canvasRef.current.toDataURL());
+    };
+
     if (canvasRef.current) {
-      // 폰트가 로드될 때까지 대기 후 렌더링
       const fontName = font;
-      document.fonts.load(`40px "${fontName}"`).then(() => {
-        renderToCanvas(canvasRef.current, { text, font, bubbleColor, borderColor, textColor, bubbleType, hasTail });
-        setImgDataUrl(canvasRef.current.toDataURL());
-      });
+      
+      // 1. 이미 로드되었는지 확인
+      if (document.fonts.check(`40px "${fontName}"`)) {
+        updateCanvas();
+      } else {
+        // 2. 로드 대기
+        document.fonts.load(`40px "${fontName}"`).then(() => {
+          updateCanvas();
+        }).catch(() => {
+          // 로드 실패 시에도 일단 렌더링 (기본 폰트로라도)
+          updateCanvas();
+        });
+      }
+
+      // 3. 브라우저가 폰트 로드 완료 이벤트를 발생시킬 때 다시 한 번 렌더링 (안정성 확보)
+      // 특히 Google Fonts 같이 외부 리소스를 불러올 때 유용함
+      const handleFontsChange = () => {
+        if (document.fonts.check(`40px "${fontName}"`)) {
+          updateCanvas();
+        }
+      };
+      
+      document.fonts.addEventListener('loadingdone', handleFontsChange);
+      
+      return () => {
+        isMounted = false;
+        document.fonts.removeEventListener('loadingdone', handleFontsChange);
+      };
     }
+
+    return () => {
+      isMounted = false;
+    };
   }, [text, font, bubbleColor, borderColor, textColor, bubbleType, hasTail]);
 
   const handleDownload = () => {

@@ -1,4 +1,68 @@
 /**
+ * 공통 말풍선 꼬리 그리기
+ * @param {CanvasRenderingContext2D} ctx 
+ * @param {number} x 말풍선 몸통의 x
+ * @param {number} y 말풍선 몸통의 y
+ * @param {number} w 말풍선 몸통의 너비
+ * @param {number} h 말풍선 몸통의 높이
+ */
+const drawTail = (ctx, x, y, w, h, type) => {
+  // 꼬리 위치 설정
+  let tailX = x + 50;
+  let tailY = y + h - 2;
+
+  // 특정 타입에 따른 꼬리 시작점 미세 조정 (도형 내부로 약간 침투시키기)
+  if (type === "round") {
+    tailY = y + h - 2;
+  } else if (type === "sharp") {
+    tailY = y + h - 2;
+  } else if (type === 'cloudy') {
+    tailX = x + 110;
+    tailY = y + h + 2;
+  } else if (type === 'heart') {
+    return;
+  } else if (type === 'ellipse') {
+    tailX = x + w/2 + 10;
+    tailY = y + h - 3;
+  } else if (type === 'spiky') {
+    return;
+  } else if (type === 'bubbly') {
+    tailX = x + w/2 + 10;
+    tailY = y + h - 1;
+  } else if (type === 'iphone') {
+    tailX = x + 80;
+    tailY = y + h -2;
+  }
+
+  const tailWidth = 30;
+  const tailHeight = 25;
+
+  // 1. 꼬리 채우기 (테두리 없이 먼저 채움)
+  ctx.beginPath();
+  ctx.moveTo(tailX, tailY);
+  ctx.lineTo(tailX - 15, tailY + tailHeight);
+  ctx.lineTo(tailX - tailWidth, tailY);
+  ctx.closePath();
+  ctx.fill();
+
+  // 2. 꼬리 테두리 (좌측과 우측 사선만 그림)
+  ctx.beginPath();
+  ctx.moveTo(tailX - tailWidth, tailY);
+  ctx.lineTo(tailX - 15, tailY + tailHeight);
+  ctx.lineTo(tailX, tailY);
+  ctx.stroke();
+
+  // 3. 연결 부위 경계선 지우기 (도형 내부 침투 영역을 배경색으로 덮음)
+  ctx.save();
+  ctx.globalCompositeOperation = 'source-over';
+  ctx.beginPath();
+  // 꼬리의 윗변을 포함하여 말풍선 안쪽으로 살짝 들어간 영역을 다시 채움
+  ctx.rect(tailX - tailWidth - 1, tailY - 5, tailWidth + 2, 6);
+  ctx.fill();
+  ctx.restore();
+};
+
+/**
  * Canvas에 말풍선을 그리는 함수
  * @param {CanvasRenderingContext2D} ctx 
  * @param {string} type 'round', 'cloudy', 'sharp', 'heart', 'star', 'ellipse'
@@ -12,13 +76,15 @@
  */
 export const drawSpeechBubble = (ctx, type, x, y, w, h, bubbleColor, borderColor, hasTail = true) => {
   ctx.save();
-  ctx.beginPath();
   
   // 말풍선 타입에 따른 기본 스타일 설정
   ctx.fillStyle = bubbleColor;
   ctx.strokeStyle = borderColor;
   ctx.lineWidth = 2;
+  ctx.lineJoin = 'round';
+  ctx.lineCap = 'round';
 
+  ctx.beginPath();
   const r = 20; // border radius
 
   if (type === 'round') {
@@ -27,11 +93,6 @@ export const drawSpeechBubble = (ctx, type, x, y, w, h, bubbleColor, borderColor
     ctx.quadraticCurveTo(x + w, y, x + w, y + r);
     ctx.lineTo(x + w, y + h - r);
     ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
-    if (hasTail) {
-      ctx.lineTo(x + 60, y + h);
-      ctx.lineTo(x + 40, y + h + 20);
-      ctx.lineTo(x + 30, y + h);
-    }
     ctx.lineTo(x + r, y + h);
     ctx.quadraticCurveTo(x, y + h, x, y + h - r);
     ctx.lineTo(x, y + r);
@@ -41,11 +102,6 @@ export const drawSpeechBubble = (ctx, type, x, y, w, h, bubbleColor, borderColor
     ctx.moveTo(x, y);
     ctx.lineTo(x + w, y);
     ctx.lineTo(x + w, y + h);
-    if (hasTail) {
-      ctx.lineTo(x + 60, y + h);
-      ctx.lineTo(x + 40, y + h + 20);
-      ctx.lineTo(x + 30, y + h);
-    }
     ctx.lineTo(x, y + h);
     ctx.closePath();
   } else if (type === 'cloudy') {
@@ -54,66 +110,33 @@ export const drawSpeechBubble = (ctx, type, x, y, w, h, bubbleColor, borderColor
     ctx.bezierCurveTo(x, y - 10, x + step, y - 10, x + step * 2, y);
     ctx.bezierCurveTo(x + step * 3, y - 10, x + w, y - 10, x + w, y + h / 2);
     ctx.bezierCurveTo(x + w, y + h + 10, x + step * 3, y + h + 10, x + step * 2, y + h);
-    if (hasTail) {
-      ctx.lineTo(x + 60, y + h + 5);
-      ctx.lineTo(x + 40, y + h + 20);
-      ctx.lineTo(x + 30, y + h + 5);
-    }
     ctx.bezierCurveTo(x + step, y + h + 10, x, y + h + 10, x, y + h / 2);
     ctx.closePath();
   } else if (type === 'heart') {
     const topCurveHeight = h * 0.35;
     const centerX = x + w / 2;
-    
     ctx.moveTo(centerX, y + topCurveHeight + 10);
-    // Left side of the heart
     ctx.bezierCurveTo(centerX, y - 5, x, y - 5, x, y + topCurveHeight + 10);
     ctx.bezierCurveTo(x, y + h * 0.6, centerX - w * 0.1, y + h * 0.8, centerX, y + h);
-    
-    if (hasTail) {
-      ctx.lineTo(centerX - 5, y + h + 15);
-      ctx.lineTo(centerX - 15, y + h * 0.85);
-    }
-    
-    // Right side of the heart
     ctx.bezierCurveTo(centerX + w * 0.1, y + h * 0.8, x + w, y + h * 0.6, x + w, y + topCurveHeight + 10);
     ctx.bezierCurveTo(x + w, y - 5, centerX, y - 5, centerX, y + topCurveHeight + 10);
     ctx.closePath();
   } else if (type === 'ellipse') {
-    if (hasTail) {
-      // Draw ellipse with tail as a single path
-      ctx.moveTo(x + w, y + h / 2);
-      // Bottom half with tail
-      ctx.bezierCurveTo(x + w, y + h, x + w * 0.7, y + h, x + w / 2, y + h);
-      ctx.lineTo(x + w * 0.4, y + h + 15);
-      ctx.lineTo(x + w * 0.3, y + h);
-      ctx.bezierCurveTo(x + w * 0.1, y + h, x, y + h, x, y + h / 2);
-      // Top half
-      ctx.bezierCurveTo(x, y, x + w * 0.1, y, x + w / 2, y);
-      ctx.bezierCurveTo(x + w * 0.9, y, x + w, y, x + w, y + h / 2);
-    } else {
-      ctx.ellipse(x + w / 2, y + h / 2, w / 2, h / 2, 0, 0, Math.PI * 2);
-    }
+    ctx.ellipse(x + w / 2, y + h / 2, w / 2, h / 2, 0, 0, Math.PI * 2);
     ctx.closePath();
   } else if (type === 'iphone') {
-    // iPhone Style: Very rounded, tail on the side
     const rr = Math.min(w, h) * 0.4;
     ctx.moveTo(x + rr, y);
     ctx.lineTo(x + w - rr, y);
     ctx.quadraticCurveTo(x + w, y, x + w, y + rr);
     ctx.lineTo(x + w, y + h - rr);
     ctx.quadraticCurveTo(x + w, y + h, x + w - rr, y + h);
-    if (hasTail) {
-      ctx.lineTo(x + w - 10, y + h + 5);
-      ctx.quadraticCurveTo(x + w + 5, y + h + 15, x + w + 10, y + h + 15);
-      ctx.quadraticCurveTo(x + w, y + h + 15, x + w - rr * 0.5, y + h);
-    }
     ctx.lineTo(x + rr, y + h);
     ctx.quadraticCurveTo(x, y + h, x, y + h - rr);
     ctx.lineTo(x, y + rr);
     ctx.quadraticCurveTo(x, y, x + rr, y);
+    ctx.closePath();
   } else if (type === 'spiky') {
-    // Spiky/Action style
     const points = 20;
     const centerX = x + w / 2;
     const centerY = y + h / 2;
@@ -125,14 +148,8 @@ export const drawSpeechBubble = (ctx, type, x, y, w, h, bubbleColor, borderColor
       if (i === 0) ctx.moveTo(px, py);
       else ctx.lineTo(px, py);
     }
-    if (hasTail) {
-      ctx.lineTo(x + 50, y + h);
-      ctx.lineTo(x + 20, y + h + 25);
-      ctx.lineTo(x + 35, y + h - 10);
-    }
     ctx.closePath();
   } else if (type === 'bubbly') {
-    // Bubbly: many overlapping circles/arcs
     const segments = 8;
     for (let i = 0; i < segments; i++) {
       const angle1 = (i / segments) * Math.PI * 2;
@@ -146,15 +163,18 @@ export const drawSpeechBubble = (ctx, type, x, y, w, h, bubbleColor, borderColor
       if (i === 0) ctx.moveTo(x + w / 2 + Math.cos(angle1) * (w / 2), y + h / 2 + Math.sin(angle1) * (h / 2));
       ctx.quadraticCurveTo(cpx, cpy, x2, y2);
     }
-    if (hasTail) {
-      ctx.lineTo(x + 50, y + h - 5);
-      ctx.quadraticCurveTo(x + 40, y + h + 20, x + 30, y + h - 10);
-    }
     ctx.closePath();
   }
 
+  // 몸통 먼저 그리기
   ctx.fill();
   ctx.stroke();
+
+  // 꼬리 그리기 (모든 타입 동일한 모양과 위치)
+  if (hasTail) {
+    drawTail(ctx, x, y, w, h, type);
+  }
+
   ctx.restore();
 };
 

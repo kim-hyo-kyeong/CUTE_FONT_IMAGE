@@ -42,8 +42,12 @@ const App = () => {
 
   useEffect(() => {
     if (canvasRef.current) {
-      renderToCanvas(canvasRef.current, { text, font, bubbleColor, borderColor, textColor, bubbleType, hasTail });
-      setImgDataUrl(canvasRef.current.toDataURL());
+      // 폰트가 로드될 때까지 대기 후 렌더링
+      const fontName = font;
+      document.fonts.load(`40px "${fontName}"`).then(() => {
+        renderToCanvas(canvasRef.current, { text, font, bubbleColor, borderColor, textColor, bubbleType, hasTail });
+        setImgDataUrl(canvasRef.current.toDataURL());
+      });
     }
   }, [text, font, bubbleColor, borderColor, textColor, bubbleType, hasTail]);
 

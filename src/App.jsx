@@ -209,7 +209,8 @@ const App = () => {
               <img 
                 src={imgDataUrl} 
                 alt="Generated" 
-                className="max-w-full h-auto shadow-lg rounded-lg"
+                className="max-w-full h-auto shadow-lg rounded-lg select-none pointer-events-auto touch-manipulation"
+                style={{ WebkitTouchCallout: 'default' }}
               />
             )}
           </div>

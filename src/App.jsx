@@ -21,7 +21,10 @@ const App = () => {
     { name: '주아', value: 'Jua' },
     { name: '해바라기', value: 'Sunflower' },
     { name: '감자꽃', value: 'Gamja Flower' },
-    { name: '하이멜로디', value: 'Hi Melody' }
+    { name: '하이멜로디', value: 'Hi Melody' },
+    { name: '동글', value: 'Dongle' },
+    { name: '고운바탕', value: 'Gowun Batang' },
+    { name: '싱글데이', value: 'Single Day' }
   ];
 
   const colors = [

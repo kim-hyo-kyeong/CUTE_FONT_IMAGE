@@ -24,7 +24,11 @@ const App = () => {
     { name: '하이멜로디', value: 'Hi Melody' },
     { name: '동글', value: 'Dongle' },
     { name: '고운바탕', value: 'Gowun Batang' },
-    { name: '싱글데이', value: 'Single Day' }
+    { name: '싱글데이', value: 'Single Day' },
+    { name: '오르빗', value: 'Orbit' },
+    { name: '모이라이', value: 'Moirai One' },
+    { name: '독도', value: 'East Sea Dokdo' },
+    { name: '베이글', value: 'Bagel Fat One' }
   ];
 
   const colors = [

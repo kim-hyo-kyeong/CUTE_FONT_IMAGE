@@ -10,6 +10,7 @@ const App = () => {
   const [textColor, setTextColor] = useState('#000000');
   const [bubbleType, setBubbleType] = useState('round');
   const [hasTail, setHasTail] = useState(true);
+  const [imgDataUrl, setImgDataUrl] = useState('');
   const canvasRef = useRef(null);
 
   const fonts = [
@@ -42,6 +43,7 @@ const App = () => {
   useEffect(() => {
     if (canvasRef.current) {
       renderToCanvas(canvasRef.current, { text, font, bubbleColor, borderColor, textColor, bubbleType, hasTail });
+      setImgDataUrl(canvasRef.current.toDataURL());
     }
   }, [text, font, bubbleColor, borderColor, textColor, bubbleType, hasTail]);
 
@@ -202,7 +204,14 @@ const App = () => {
         {/* 프리뷰 영역 */}
         <div className="flex flex-col items-center justify-center bg-gray-50 rounded-xl p-8 border-2 border-dashed border-gray-200">
           <div className="mb-8 overflow-auto max-w-full">
-            <canvas ref={canvasRef} className="max-w-full h-auto" />
+            <canvas ref={canvasRef} className="hidden" />
+            {imgDataUrl && (
+              <img 
+                src={imgDataUrl} 
+                alt="Generated" 
+                className="max-w-full h-auto shadow-lg rounded-lg"
+              />
+            )}
           </div>
           
           <button

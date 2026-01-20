@@ -15,15 +15,9 @@ export const drawSpeechBubble = (ctx, type, x, y, w, h, bubbleColor, borderColor
   ctx.beginPath();
   
   // 말풍선 타입에 따른 기본 스타일 설정
-  if (type === 'infinite') {
-    ctx.fillStyle = bubbleColor === '#ffffff' ? '#ffeb3b' : bubbleColor;
-    ctx.strokeStyle = borderColor === '#333333' ? '#000000' : borderColor;
-    ctx.lineWidth = 4;
-  } else {
-    ctx.fillStyle = bubbleColor;
-    ctx.strokeStyle = borderColor;
-    ctx.lineWidth = 2;
-  }
+  ctx.fillStyle = bubbleColor;
+  ctx.strokeStyle = borderColor;
+  ctx.lineWidth = 2;
 
   const r = 20; // border radius
 
@@ -93,36 +87,6 @@ export const drawSpeechBubble = (ctx, type, x, y, w, h, bubbleColor, borderColor
       ctx.bezierCurveTo(x + w * 0.9, y, x + w, y, x + w, y + h / 2);
     } else {
       ctx.ellipse(x + w / 2, y + h / 2, w / 2, h / 2, 0, 0, Math.PI * 2);
-    }
-    ctx.closePath();
-  } else if (type === 'infinite') {
-    // Infinite Challenge Style: Custom background, thick black jagged border
-    
-    const points = 15;
-    const jitter = 5;
-    
-    ctx.moveTo(x, y);
-    // Top
-    for (let i = 1; i <= points; i++) {
-      ctx.lineTo(x + (w / points) * i, y + (Math.random() - 0.5) * jitter);
-    }
-    // Right
-    for (let i = 1; i <= points; i++) {
-      ctx.lineTo(x + w + (Math.random() - 0.5) * jitter, y + (h / points) * i);
-    }
-    // Tail (Bottom-leftish)
-    if (hasTail) {
-      ctx.lineTo(x + 60, y + h);
-      ctx.lineTo(x + 40, y + h + 20);
-      ctx.lineTo(x + 30, y + h);
-    }
-    // Bottom
-    for (let i = points - 1; i >= 0; i--) {
-      ctx.lineTo(x + (w / points) * i, y + h + (Math.random() - 0.5) * jitter);
-    }
-    // Left
-    for (let i = points - 1; i >= 0; i--) {
-      ctx.lineTo(x + (Math.random() - 0.5) * jitter, y + (h / points) * i);
     }
     ctx.closePath();
   } else if (type === 'iphone') {
@@ -198,11 +162,7 @@ export const renderToCanvas = (canvas, { text, font, bubbleColor, borderColor, t
   
   // 폰트 설정
   let fontSize = 40;
-  if (bubbleType === 'infinite') {
-    ctx.font = `bold ${fontSize}px "${font}"`;
-  } else {
-    ctx.font = `${fontSize}px "${font}"`;
-  }
+  ctx.font = `${fontSize}px "${font}"`;
 
   const lines = text.split('\n');
   const metrics = lines.map(line => ctx.measureText(line));
@@ -248,13 +208,8 @@ export const renderToCanvas = (canvas, { text, font, bubbleColor, borderColor, t
   }
 
   // 텍스트 그리기 설정 (폰트 다시 설정 - canvas width 변경 시 초기화될 수 있음)
-  if (bubbleType === 'infinite') {
-    ctx.font = `bold ${fontSize}px "${font}"`;
-    ctx.fillStyle = textColor === '#000000' ? 'black' : textColor; // Keep default black for infinite if not changed
-  } else {
-    ctx.font = `${fontSize}px "${font}"`;
-    ctx.fillStyle = textColor;
-  }
+  ctx.font = `${fontSize}px "${font}"`;
+  ctx.fillStyle = textColor;
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
   
@@ -262,14 +217,6 @@ export const renderToCanvas = (canvas, { text, font, bubbleColor, borderColor, t
 
   lines.forEach((line, i) => {
     const yOffset = startY + (i * lineHeight);
-    if (bubbleType === 'infinite') {
-        ctx.strokeStyle = 'white';
-        ctx.lineWidth = 6;
-        ctx.lineJoin = 'round';
-        ctx.strokeText(line, canvas.width / 2, yOffset);
-        ctx.fillText(line, canvas.width / 2, yOffset);
-    } else {
-        ctx.fillText(line, canvas.width / 2, yOffset);
-    }
+    ctx.fillText(line, canvas.width / 2, yOffset);
   });
 };

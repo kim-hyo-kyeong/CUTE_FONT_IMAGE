@@ -34,7 +34,6 @@ const App = () => {
     { name: '구름 말풍선', value: 'cloudy' },
     { name: '하트 모양', value: 'heart' },
     { name: '타원 모양', value: 'ellipse' },
-    { name: '무한도전', value: 'infinite' },
     { name: '아이폰', value: 'iphone' },
     { name: '삐쭉삐쭉', value: 'spiky' },
     { name: '몽글몽글', value: 'bubbly' }

@@ -62,16 +62,22 @@ export const drawSpeechBubble = (ctx, type, x, y, w, h, bubbleColor, borderColor
     ctx.bezierCurveTo(x + step, y + h + 10, x, y + h + 10, x, y + h / 2);
     ctx.closePath();
   } else if (type === 'heart') {
-    const topCurveHeight = h * 0.3;
-    ctx.moveTo(x + w / 2, y + topCurveHeight);
-    ctx.bezierCurveTo(x + w / 2, y, x + w, y, x + w, y + topCurveHeight);
-    ctx.bezierCurveTo(x + w, y + (h + topCurveHeight) / 2, x + w / 2, y + (h + topCurveHeight) / 2, x + w / 2, y + h);
+    const topCurveHeight = h * 0.35;
+    const centerX = x + w / 2;
+    
+    ctx.moveTo(centerX, y + topCurveHeight + 10);
+    // Left side of the heart
+    ctx.bezierCurveTo(centerX, y - 5, x, y - 5, x, y + topCurveHeight + 10);
+    ctx.bezierCurveTo(x, y + h * 0.6, centerX - w * 0.1, y + h * 0.8, centerX, y + h);
+    
     if (hasTail) {
-      ctx.lineTo(x + w / 2 - 5, y + h + 15);
-      ctx.lineTo(x + w / 2 - 15, y + h * 0.85);
+      ctx.lineTo(centerX - 5, y + h + 15);
+      ctx.lineTo(centerX - 15, y + h * 0.85);
     }
-    ctx.bezierCurveTo(x + w / 2, y + (h + topCurveHeight) / 2, x, y + (h + topCurveHeight) / 2, x, y + topCurveHeight);
-    ctx.bezierCurveTo(x, y, x + w / 2, y, x + w / 2, y + topCurveHeight);
+    
+    // Right side of the heart
+    ctx.bezierCurveTo(centerX + w * 0.1, y + h * 0.8, x + w, y + h * 0.6, x + w, y + topCurveHeight + 10);
+    ctx.bezierCurveTo(x + w, y - 5, centerX, y - 5, centerX, y + topCurveHeight + 10);
     ctx.closePath();
   } else if (type === 'ellipse') {
     if (hasTail) {
